@@ -1,0 +1,45 @@
+name: Daily App Reviews Agent
+
+on:
+  schedule:
+    # 9:00am Buenos Aires time (ART = UTC-3) = 12:00 UTC
+    - cron: '0 12 * * *'
+  workflow_dispatch:  # allows manual trigger from GitHub UI
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Decode iOS .p8 key file
+        run: |
+          echo "${{ secrets.IOS_P8_KEY_B64 }}" | base64 --decode > /tmp/ios_key.p8
+
+      - name: Decode Android service account JSON
+        run: |
+          echo "${{ secrets.ANDROID_SERVICE_ACCT_B64 }}" | base64 --decode > /tmp/android_service_acct.json
+
+      - name: Run review agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          IOS_ISSUER_ID: ${{ secrets.IOS_ISSUER_ID }}
+          IOS_KEY_ID: ${{ secrets.IOS_KEY_ID }}
+          IOS_APP_ID: ${{ secrets.IOS_APP_ID }}
+          IOS_P8_PATH: /tmp/ios_key.p8
+          ANDROID_PACKAGE: ${{ secrets.ANDROID_PACKAGE }}
+          ANDROID_SERVICE_ACCT: /tmp/android_service_acct.json
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASS: ${{ secrets.GMAIL_APP_PASS }}
+          REPORT_EMAIL: ${{ secrets.REPORT_EMAIL }}
+        run: python agent.py

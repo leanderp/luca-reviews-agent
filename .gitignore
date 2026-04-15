@@ -1,0 +1,23 @@
+# Credentials — never commit these
+.env
+*.p8
+*service_acct*.json
+*service-account*.json
+
+# Debug scripts
+debug_ios*.py
+debug_ios*.py
+
+# Runtime files
+reports/
+feedback.json
+ios_responded.json
+android_responded.json
+__pycache__/
+*.pyc
+
+# One-time scripts
+init_*.py
+post_android.py
+test_*.py
+setup.sh
