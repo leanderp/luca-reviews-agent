@@ -230,14 +230,8 @@ Rules:
         tools=[{"type": "agent_toolset_20260401"}],
     )
 
-    environment = client.beta.environments.create(
-        name="review-responder-env",
-        config={"type": "cloud", "networking": {"type": "unrestricted"}},
-    )
-
     session = client.beta.sessions.create(
         agent=agent.id,
-        environment_id=environment.id,
         title=f"Daily reviews {datetime.date.today()}",
     )
 
